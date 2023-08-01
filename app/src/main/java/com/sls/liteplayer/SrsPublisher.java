@@ -124,7 +124,7 @@ public class SrsPublisher {
         if (fc != null){
             try {
                 // 写入bs中的数据到file中
-                //Log.i(TAG, "publishData: write file, size=" + data.remaining() );
+//                Log.i(TAG, "publishData: write file, size=" + data.remaining() );
                 if (data.hasRemaining()) {
                     fc.write(data);
                     data.flip();
