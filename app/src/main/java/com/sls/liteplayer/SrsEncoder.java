@@ -445,15 +445,6 @@ public class SrsEncoder {
 
         return output;
     }
-/*
-    private native byte[] RGBAToI420(byte[] rgbaFrame, int width, int height, boolean flip, int rotate);
-    private native byte[] RGBAToNV12(byte[] rgbaFrame, int width, int height, boolean flip, int rotate);
-
-    static {
-        System.loadLibrary("yuv");
-        System.loadLibrary("enc");
-    }
-*/
 
 /****
  * Audio

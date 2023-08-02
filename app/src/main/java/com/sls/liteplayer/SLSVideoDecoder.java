@@ -236,7 +236,7 @@ public class SLSVideoDecoder extends SLSMediaCodec {
 							String support = MediaCodecUtils.getSupportMax(mMimeType);
 							if (support != null) {
 								String width = support.substring(0, support.indexOf("x"));
-								String height = support.substring(support.indexOf("x") + 1, support.length());
+								String height = support.substring(support.indexOf("x") + 1);
 								Log.i(TAG, " current " + mVideoWidth + "x" + mVideoHeight + " mMimeType " + mMimeType);
 								Log.i(TAG, " Max " + width + "x" + height + " mMimeType " + mMimeType);
 							}

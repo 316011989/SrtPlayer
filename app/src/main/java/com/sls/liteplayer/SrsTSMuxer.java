@@ -7,19 +7,15 @@ import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-
-//list
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by Edward.Wu on 2019/03/28.
  * to POST the h.264/avc annexb frame over multi cast.
+ *
  * @see android.media.MediaMuxer https://developer.android.com/reference/android/media/MediaMuxer.html
  */
 public class SrsTSMuxer {
@@ -162,6 +158,7 @@ public class SrsTSMuxer {
     public SrsTSMuxer() {
 
     }
+
     void setPublisher(SrsPublisher publisher) {
         mPublisher = publisher;
     }
@@ -209,7 +206,7 @@ public class SrsTSMuxer {
         return mPublisher.send(pack);
     }
 
-    private void reset(){
+    private void reset() {
         mLastSendPATDTS = 0;
         mPATPMTCC = 0;
         mLastSendPCR = 0;
@@ -225,7 +222,7 @@ public class SrsTSMuxer {
     public void start(final String netUrl) {
         reset();
         if (null == mPublisher) {
-            return ;
+            return;
         }
         boolean connected = mPublisher.open(netUrl);
 
@@ -274,11 +271,6 @@ public class SrsTSMuxer {
         }
         Log.i(TAG, "SrsTSMuxer closed");
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-            }
-        }).start();
         mPublisher.close();
     }
 
@@ -308,15 +300,15 @@ public class SrsTSMuxer {
         mAudioMedia.mAudioFrame.real_pts = pts;
 
         //pts = mAudioMedia.mCalcPTS.PutPTS(pts);
-        mAudioMedia.mAudioFrame.duration = pts - mAudioMedia.mAudioFrame.pts ;
+        mAudioMedia.mAudioFrame.duration = pts - mAudioMedia.mAudioFrame.pts;
         mAudioMedia.mAudioFrame.pts = pts;
         mAudioMedia.mAudioFrame.dts = pts;
 
-        //Log.i(TAG, String.format("audio frame=%d, pts=%d(%d), real_pts=%d, duration=%d, real_duration=%d.",
-        //        mAudioMedia.mAudioFrame.index, pts, pts/TS_90K_CLOCK, mAudioMedia.mAudioFrame.real_pts,
-        //        mAudioMedia.mAudioFrame.duration/TS_90K_CLOCK, d/TS_90K_CLOCK));
+        Log.i(TAG, String.format("audio frame=%d, pts=%d(%d), real_pts=%d, duration=%d, real_duration=%d.",
+                mAudioMedia.mAudioFrame.index, pts, pts/TS_90K_CLOCK, mAudioMedia.mAudioFrame.real_pts,
+                mAudioMedia.mAudioFrame.duration/TS_90K_CLOCK, d/TS_90K_CLOCK));
 
-        byte[] header = new byte[] {(byte)0xFF, (byte)0xF1, (byte)0x50, (byte)0x80, (byte)0x2F, (byte)0x7F, (byte)0xFC};
+        byte[] header = new byte[]{(byte) 0xFF, (byte) 0xF1, (byte) 0x50, (byte) 0x80, (byte) 0x2F, (byte) 0x7F, (byte) 0xFC};
         byte tmp = 0;
 
 //        byte[] csd_0 = bb.array();
@@ -329,7 +321,7 @@ public class SrsTSMuxer {
             // 1.6.2.1 AudioSpecificConfig
             // audioObjectType; 5 bslbf
             tmp = bb.get(0);
-            byte ch = (byte)(tmp & 0xf8);
+            byte ch = (byte) (tmp & 0xf8);
             tmp = bb.get(1);
             // 3bits left.
 
@@ -343,7 +335,7 @@ public class SrsTSMuxer {
             ch |= (samplingFrequencyIndex >> 1) & 0x07;
             //mAudioMedia.audio_tag.put(ch, 2);
 
-            ch = (byte)((samplingFrequencyIndex << 7) & 0x80);
+            ch = (byte) ((samplingFrequencyIndex << 7) & 0x80);
             // 7bits left.
 
             // channelConfiguration; 4 bslbf
@@ -422,9 +414,9 @@ public class SrsTSMuxer {
         // copyright id start: 0 (1-bit)
         frame[offset + 3] |= 0 << 2;
         // frame size (13-bit)
-        frame[offset + 3] |= ((frame_len ) & 0x1800) >> 11;
-        frame[offset + 4] = (byte) (((frame_len ) & 0x7f8) >> 3);
-        frame[offset + 5] = (byte) (((frame_len ) & 0x7) << 5);
+        frame[offset + 3] |= ((frame_len) & 0x1800) >> 11;
+        frame[offset + 4] = (byte) (((frame_len) & 0x7f8) >> 3);
+        frame[offset + 5] = (byte) (((frame_len) & 0x7) << 5);
         // buffer fullness (0x7ff for variable bitrate)
         frame[offset + 5] |= (byte) 0x1f;
         frame[offset + 6] = (byte) 0xfc;
@@ -434,15 +426,19 @@ public class SrsTSMuxer {
 
 
     public void writeVideoSample(final ByteBuffer bb, MediaCodec.BufferInfo bi) {
-        long pcr = TS_90K_CLOCK * bi.presentationTimeUs / 1000 ;// for pcr
+        long pcr = TS_90K_CLOCK * bi.presentationTimeUs / 1000;// for pcr
         long pts = pcr + TS_PCR_DTS_DELAY;
         //FIXME: need to consider dts of B frame
 
         mVideoMedia.mVideoFrame.real_pts = pts;
-        mVideoMedia.mVideoFrame.duration = pts - mVideoMedia.mVideoFrame.pts ;
+        mVideoMedia.mVideoFrame.duration = pts - mVideoMedia.mVideoFrame.pts;
         mVideoMedia.mVideoFrame.pts = pts;
         mVideoMedia.mVideoFrame.dts = pts;
         mVideoMedia.mVideoFrame.pcr = pcr;
+
+        Log.i(TAG, String.format("video frame=%d, pts=%d(%d), real_pts=%d, duration=%d, real_duration=%d.",
+                mVideoMedia.mVideoFrame.index, pts, pts/TS_90K_CLOCK, mVideoMedia.mVideoFrame.real_pts,
+                mVideoMedia.mVideoFrame.duration/TS_90K_CLOCK, pcr/TS_90K_CLOCK));
 
         // send each frame.
         while (bb.position() < bi.size) {
@@ -506,9 +502,9 @@ public class SrsTSMuxer {
 
                 //Log.i(TAG, String.format("frame=%d, annexb mux %dB, len=%dB, nalu=%d, base=%d, pts=%d(%d), d=%d, pcr=%d(%d)",
                 //        mVideoMedia.mVideoFrame.index, bi.size, frame.len, nal_unit_type, base, pts, pts/TS_90K_CLOCK, mVideoMedia.mVideoFrame.duration/TS_90K_CLOCK, pcr, pcr/TS_90K_CLOCK ));
-                mVideoMedia.mVideoFrame.index ++;
+                mVideoMedia.mVideoFrame.index++;
 
-            }else {
+            } else {
                 //other NAL
                 //pes frame data
                 //mVideoMedia.mVideoFrame.data.put(frame.data);
@@ -522,8 +518,8 @@ public class SrsTSMuxer {
     private static byte[] longToBytes(long v, boolean littleEndian) {
         long[] la = new long[1];
         la[0] = v;
-        ByteBuffer bb = ByteBuffer.allocate(la.length*8);
-        if(littleEndian){
+        ByteBuffer bb = ByteBuffer.allocate(la.length * 8);
+        if (littleEndian) {
             // ByteBuffer.order(ByteOrder) 方法指定字节序,即大小端模式(BIG_ENDIAN/LITTLE_ENDIAN)
             // ByteBuffer 默认为大端(BIG_ENDIAN)模式
             bb.order(ByteOrder.LITTLE_ENDIAN);
@@ -533,28 +529,25 @@ public class SrsTSMuxer {
     }
 
 
-
-    private void SrsPESToTS(SrsPESFrame pes_frame){
-
+    private void SrsPESToTS(SrsPESFrame pes_frame) {
         ByteBuffer ts_pack = ByteBuffer.allocateDirect(TS_PACK_LEN);
         ByteBuffer ts_header = ByteBuffer.allocateDirect(4);
         ByteBuffer pes_header = ByteBuffer.allocateDirect(19);//9(header)+5(pts)+5(dts)
         ByteBuffer adaptation_field = ByteBuffer.allocateDirect(TS_PACK_LEN - 4);
         byte[] dst;
 
-        ByteBuffer temp_buffer;
 
         boolean first = true;
-        byte temp ;
+        byte temp;
 
-        int header_size ;
-        int flags ;
+        int header_size;
+        int flags;
 
-        int pes_size = 0 ;
-        int body_size ;
+        int pes_size = 0;
+        int body_size;
         int copy_size;
-        int in_size ;
-        int stuff_size ;
+        int in_size;
+        int stuff_size;
         int i = 0;
 
         //check pcr
@@ -566,13 +559,13 @@ public class SrsTSMuxer {
 
         //check patpmt interval
         if (pes_frame.dts - mLastSendPATDTS >= TS_PATPMT_INTERVAL) {
-            TS_PAT_DATA[3] = (byte)(TS_PAT_DATA[3] & 0xF0 | mPATPMTCC);
+            TS_PAT_DATA[3] = (byte) (TS_PAT_DATA[3] & 0xF0 | mPATPMTCC);
             mTSUDPPackList.SrsPutTSData(ByteBuffer.wrap(TS_PAT_DATA));
-            TS_PMT_DATA[3] = (byte)(TS_PMT_DATA[3] & 0xF0 | mPATPMTCC);
+            TS_PMT_DATA[3] = (byte) (TS_PMT_DATA[3] & 0xF0 | mPATPMTCC);
             mPATPMTCC += 1;
             mPATPMTCC &= 0x0F;
             mTSUDPPackList.SrsPutTSData(ByteBuffer.wrap(TS_PMT_DATA));
-            mLastSendPATDTS = pes_frame.dts ;
+            mLastSendPATDTS = pes_frame.dts;
         }
         //check patpmt interval
         long tm = System.currentTimeMillis();
@@ -586,7 +579,6 @@ public class SrsTSMuxer {
             TS_NULL_DATA[9] = sysTM[5];
             TS_NULL_DATA[10] = sysTM[6];
             TS_NULL_DATA[11] = sysTM[7];
-            int pid = ((int)(TS_NULL_DATA[1] & 0x1F) << 8) | TS_NULL_DATA[2]&0xFF;
             mTSUDPPackList.SrsPutTSData(ByteBuffer.wrap(TS_NULL_DATA));
             mLastSendSysTime = tm;
             Log.i(TAG, String.format("SrsPESToTS net send tm=%d", tm));
@@ -597,34 +589,34 @@ public class SrsTSMuxer {
 
             //ts header
             ts_header.put(TS_SYNC_BYTE);
-            temp = (byte)(pes_frame.pid >> 8);
-            if (first ) {
-                temp = (byte)(temp | 0x40);
+            temp = (byte) (pes_frame.pid >> 8);
+            if (first) {
+                temp = (byte) (temp | 0x40);
             }
             ts_header.put(temp);
-            ts_header.put((byte)pes_frame.pid);
-            temp = (byte)(0x10 | pes_frame.cc);
+            ts_header.put((byte) pes_frame.pid);
+            temp = (byte) (0x10 | pes_frame.cc);
             ts_header.put(temp);
 
-            if (first ) {
+            if (first) {
 
-                if (pes_frame.key_frame)  { //key frame
-                  // pcr
-                    ts_header.put(3, (byte)(ts_header.get(3) | 0x20));
+                if (pes_frame.key_frame) { //key frame
+                    // pcr
+                    ts_header.put(3, (byte) (ts_header.get(3) | 0x20));
 
-                    adaptation_field.put((byte)0x7);
-                    adaptation_field.put((byte)0x50);
+                    adaptation_field.put((byte) 0x7);
+                    adaptation_field.put((byte) 0x50);
                     SrsWritePCR(adaptation_field, pes_frame.pcr);
                     Log.i(TAG, String.format("frame=%d, write pcr=%d(%d ms)",
-                            pes_frame.index, pes_frame.pcr, pes_frame.pcr/TS_90K_CLOCK));
+                            pes_frame.index, pes_frame.pcr, pes_frame.pcr / TS_90K_CLOCK));
 
                 }
 
                 //pes header
-                pes_header.put((byte)0x00);
-                pes_header.put((byte)0x00);
-                pes_header.put((byte)0x01);
-                pes_header.put((byte)pes_frame.sid);
+                pes_header.put((byte) 0x00);
+                pes_header.put((byte) 0x00);
+                pes_header.put((byte) 0x01);
+                pes_header.put((byte) pes_frame.sid);
 
                 header_size = 5;
                 flags = 0x80;
@@ -635,24 +627,24 @@ public class SrsTSMuxer {
                 }
 
                 pes_size = pes_frame.len + header_size + 3;
-                if (pes_size > 0xFFFF || pes_frame.sid == TS_VIDEO_SID) {
+                if (pes_size > 0xFFFF || pes_frame.sid == TS_VIDEO_SID|| pes_frame.sid == TS_AUDIO_SID) {
                     pes_size = 0;
                 }
 
                 temp = (byte) (pes_size >> 8);
                 pes_header.put(temp);
-                temp = (byte) pes_size ;
+                temp = (byte) pes_size;
                 pes_header.put(temp);
-                pes_header.put((byte)0x80);//
-                pes_header.put((byte)flags);
-                pes_header.put((byte)header_size);
+                pes_header.put((byte) 0x80);//
+                pes_header.put((byte) flags);
+                pes_header.put((byte) header_size);
 
                 //write pts
                 SrsWritePTS(pes_header, flags >> 6, pes_frame.pts);//*TS_90K_CLOCK);
                 //Log.i(TAG, String.format("write pts frame=%d, nalu=%d, pts=%d, duration=%d",
                 //        pes_frame.len, pes_frame.nal_unit_type, pes_frame.pts, pes_frame.duration));
 
-                if(pes_frame.pts != pes_frame.dts){
+                if (pes_frame.pts != pes_frame.dts) {
                     SrsWritePTS(pes_header, 1, pes_frame.dts);//*TS_90K_CLOCK);
                 }
 
@@ -662,28 +654,28 @@ public class SrsTSMuxer {
             body_size = TS_PACK_LEN - ts_header.position() - adaptation_field.position() - pes_header.position();
             in_size = pes_frame.data.remaining();
 
-            if (body_size > in_size){
+            if (body_size > in_size) {
                 stuff_size = body_size - in_size;
 
                 if (adaptation_field.position() > 0) {
                     //has adaptation
-                    adaptation_field.put(0, (byte)(adaptation_field.position() + stuff_size));
-                    if (adaptation_field.remaining() < stuff_size )
+                    adaptation_field.put(0, (byte) (adaptation_field.position() + stuff_size));
+                    if (adaptation_field.remaining() < stuff_size)
                         Log.i(TAG, String.format("ts len = %d,  not 188.", ts_pack.position()));
 
-                    for (i = 0; i < stuff_size; i ++) {
-                        adaptation_field.put((byte)0xff);
+                    for (i = 0; i < stuff_size; i++) {
+                        adaptation_field.put((byte) 0xff);
                     }
                 } else {
                     /* no adaptation */
                     temp = ts_header.get(3);
-                    temp = (byte)(temp | 0x20);
+                    temp = (byte) (temp | 0x20);
                     ts_header.put(3, temp);
 
-                    if (adaptation_field.remaining() < stuff_size )
+                    if (adaptation_field.remaining() < stuff_size)
                         Log.i(TAG, String.format("ts len = %d,  not 188.", ts_pack.position()));
 
-                    adaptation_field.put((byte)(stuff_size - 1));
+                    adaptation_field.put((byte) (stuff_size - 1));
                     if (stuff_size >= 2) {
                         adaptation_field.put((byte) 0x0);
 
@@ -711,8 +703,8 @@ public class SrsTSMuxer {
                 pes_header.clear();
             }
 
-            copy_size = body_size > in_size ? in_size : body_size;
-            if(ts_pack.remaining() < copy_size)
+            copy_size = Math.min(body_size, in_size);
+            if (ts_pack.remaining() < copy_size)
                 Log.i(TAG, String.format("ts len = %d,  not 188.", ts_pack.position()));
 
             dst = new byte[copy_size];
@@ -722,24 +714,21 @@ public class SrsTSMuxer {
             ts_pack.flip();
             //INFO: check ts pack len
 
-            temp = (byte)((ts_pack.get(3) & 0x30)>>4);
-            //Log.i(TAG, String.format("ts_count=%d, sid=%x, ts_index=%d, cc=%d, adc=%d, pos=%d, limit=%d, frame len=%d, payload len=%d, udp ts len=%d(%d)",
-            //        mTSUDPPackList.ts_count, pes_frame.sid, pes_frame.ts_index, (ts_pack.get(3) & 0x0F), temp, ts_pack.position(), ts_pack.limit(), pes_frame.len, copy_size,
-            //        mTSUDPPackList.ts_udp_pack.GetData().position(),
-            //        mTSUDPPackList.ts_udp_pack.GetData().position()/TS_PACK_LEN));
-            pes_frame.ts_index ++;
-            pes_frame.cc = (byte)((pes_frame.cc + 1) & 0x0F);
+            temp = (byte) ((ts_pack.get(3) & 0x30) >> 4);
+
+            pes_frame.ts_index++;
+            pes_frame.cc = (byte) ((pes_frame.cc + 1) & 0x0F);
 
             mTSUDPPackList.SrsPutTSData(ts_pack);
             ts_pack.clear();
-            mTSUDPPackList.ts_count ++;
+            mTSUDPPackList.ts_count++;
         }
         //clear data
         pes_frame.data.clear();
     }
 
     private void SrsWritePCR(ByteBuffer data, long pcr) {
-        byte temp ;
+        byte temp;
         temp = (byte) (pcr >> 25);
         data.put(temp);
         temp = (byte) (pcr >> 17);
@@ -762,16 +751,16 @@ public class SrsTSMuxer {
         short s;
 
         val = fb << 4 | (((pts >> 30) & 0x07) << 1) | 1;
-        data.put((byte)val);
+        data.put((byte) val);
 
         val = (((pts >> 15) & 0x7fff) << 1) | 1;
 
-        data.put((byte)(val>>8));
-        data.put((byte)(val));
+        data.put((byte) (val >> 8));
+        data.put((byte) (val));
 
         val = (((pts) & 0x7fff) << 1) | 1;
-        data.put((byte)(val>>8));
-        data.put((byte)(val));
+        data.put((byte) (val >> 8));
+        data.put((byte) (val));
 
     }
 
@@ -780,8 +769,7 @@ public class SrsTSMuxer {
      * for AudioSpecificConfig, @see aac-mp4a-format-ISO_IEC_14496-3+2001.pdf, page 33
      * for audioObjectType, @see aac-mp4a-format-ISO_IEC_14496-3+2001.pdf, page 23
      */
-    private class SrsAacObjectType
-    {
+    private class SrsAacObjectType {
         public final static int Reserved = 0;
 
         // Table 1.1 – Audio Object Type definition
@@ -798,10 +786,10 @@ public class SrsTSMuxer {
 
     /**
      * the aac profile, for ADTS(HLS/TS)
+     *
      * @see https://github.com/simple-rtmp-server/srs/issues/310
      */
-    private class SrsAacProfile
-    {
+    private class SrsAacProfile {
         public final static int Reserved = 3;
 
         // @see 7.1 Profiles, aac-iso-13818-7.pdf, page 40
@@ -818,15 +806,14 @@ public class SrsTSMuxer {
      * 2 = 22 kHz = 22050 Hz
      * 3 = 44 kHz = 44100 Hz
      */
-    private class SrsCodecAudioSampleRate
-    {
+    private class SrsCodecAudioSampleRate {
         // set to the max value to reserved, for array map.
-        public final static int Reserved                 = 4;
+        public final static int Reserved = 4;
 
-        public final static int R5512                     = 0;
-        public final static int R11025                    = 1;
-        public final static int R22050                    = 2;
-        public final static int R44100                    = 3;
+        public final static int R5512 = 0;
+        public final static int R11025 = 1;
+        public final static int R22050 = 2;
+        public final static int R44100 = 3;
     }
 
 
@@ -834,8 +821,7 @@ public class SrsTSMuxer {
      * Table 7-1 – NAL unit type codes, syntax element categories, and NAL unit type classes
      * H.264-AVC-ISO_IEC_14496-10-2012.pdf, page 83.
      */
-    private class SrsAvcNaluType
-    {
+    private class SrsAvcNaluType {
         // Unspecified
         public final static int Reserved = 0;
 
@@ -884,17 +870,15 @@ public class SrsTSMuxer {
         public boolean match = false;
     }
 
-    private class SrsTSUdpPack
-    {
+    private class SrsTSUdpPack {
         private ByteBuffer ts_udp_pack = ByteBuffer.allocateDirect(TS_UDP_PACK_LEN);
 
-        boolean PutData(ByteBuffer src)
-        {
+        boolean PutData(ByteBuffer src) {
             if (src.remaining() != TS_PACK_LEN) {
                 Log.i(TAG, String.format("PutData error, ByteBuffer src len = %d, not 188.", src.remaining()));
                 return false;
             }
-            if (ts_udp_pack.remaining() >= TS_PACK_LEN){
+            if (ts_udp_pack.remaining() >= TS_PACK_LEN) {
                 ts_udp_pack.put(src);
                 return true;
             }
@@ -902,12 +886,12 @@ public class SrsTSMuxer {
             Log.i(TAG, String.format("PutData error, ts_udp_pack.remainder len = %d, < 188.", ts_udp_pack.remaining()));
             return false;
         }
-        ByteBuffer GetData()
-        {
+
+        ByteBuffer GetData() {
             return ts_udp_pack;
         }
 
-        boolean IsFull(){
+        boolean IsFull() {
             //Log.i(TAG, String.format("IsFull, position=%d, limit=%d.", ts_udp_pack.position(), ts_udp_pack.limit()));
             return ts_udp_pack.position() == ts_udp_pack.limit();
         }
@@ -917,12 +901,12 @@ public class SrsTSMuxer {
     private class SrsUDPPackList {
 
         private ConcurrentLinkedQueue<ByteBuffer> udp_packs = new ConcurrentLinkedQueue<>();
-        public SrsTSUdpPack ts_udp_pack ;
+        public SrsTSUdpPack ts_udp_pack;
         private int ts_count = 0;
 
         private final Object publishLock = new Object();
 
-        public boolean add(ByteBuffer data){
+        public boolean add(ByteBuffer data) {
             return udp_packs.add(data);
         }
 
@@ -934,11 +918,11 @@ public class SrsTSMuxer {
             udp_packs.clear();
         }
 
-        public boolean isEmpty(){
+        public boolean isEmpty() {
             return udp_packs.isEmpty();
         }
 
-        boolean SrsPutTSData( ByteBuffer ts_pack){
+        boolean SrsPutTSData(ByteBuffer ts_pack) {
             synchronized (publishLock) {//multiple thread for audio and video encoder
 
                 if (null == ts_udp_pack) {
@@ -954,7 +938,7 @@ public class SrsTSMuxer {
             }
         }
 
-        public void reset(){
+        public void reset() {
             udp_packs.clear();
             if (null != ts_udp_pack) {
                 ts_udp_pack.GetData().clear();
@@ -967,7 +951,7 @@ public class SrsTSMuxer {
     private class SrsAACMedia {
         public boolean aac_specific_config_got;
         private SrsPESFrame mAudioFrame = new SrsPESFrame();
-        public ByteBuffer adts_header = ByteBuffer.allocateDirect(AAC_ADTS_HEADER_LEN );
+        public ByteBuffer adts_header = ByteBuffer.allocateDirect(AAC_ADTS_HEADER_LEN);
 
         private int achannel;
         private int asample_rate;
@@ -980,7 +964,7 @@ public class SrsTSMuxer {
 
         }
 
-        public void reset(){
+        public void reset() {
             mAudioFrame.reset();
             mCalcPTS.reset();
         }
@@ -996,13 +980,12 @@ public class SrsTSMuxer {
 
         public SrsCalcPTS mCalcPTS = new SrsCalcPTS();
 
-        public SrsAVCMedia(){
+        public SrsAVCMedia() {
             mVideoFrame.pid = TS_VIDEO_PID;
             mVideoFrame.sid = TS_VIDEO_SID;
         }
 
-        public void reset()
-        {
+        public void reset() {
             mVideoFrame.reset();
             mCalcPTS.reset();
         }
@@ -1013,7 +996,7 @@ public class SrsTSMuxer {
      * the demuxed tag frame.
      */
     private class SrsPESFrame {
-        public ByteBuffer data = ByteBuffer.allocateDirect(PES_MAX_LEN );
+        public ByteBuffer data = ByteBuffer.allocateDirect(PES_MAX_LEN);
         public int index = 0;
         public int ts_index = 0;
         public int len = 0;
@@ -1025,14 +1008,14 @@ public class SrsTSMuxer {
         long pts = 0;
         long real_pts = 0;
         long pcr = 0;
-        long duration =0;
+        long duration = 0;
 
         byte cc = 0;
         short pid = 0;
         byte sid = 0;
 
 
-        public void reset(){
+        public void reset() {
             index = 0;
             ts_index = 0;
             len = 0;
@@ -1043,7 +1026,7 @@ public class SrsTSMuxer {
             pts = 0;
             real_pts = 0;
             pcr = 0;
-            duration =0;
+            duration = 0;
 
             cc = 0;
 
@@ -1053,8 +1036,7 @@ public class SrsTSMuxer {
 
     }
 
-    private class SrsCalcPTS
-    {
+    private class SrsCalcPTS {
         private List<Long> pts_list = new ArrayList<Long>();
         private long pts_d_sum = 0;
         private final int max_count = 5000;
@@ -1063,7 +1045,7 @@ public class SrsTSMuxer {
 
         private boolean b_start = false;
 
-        public void reset(){
+        public void reset() {
             pts_d_sum = 0;
             last_real_pts = 0;
             last_pts = 0;
@@ -1072,23 +1054,23 @@ public class SrsTSMuxer {
             pts_list.clear();
         }
 
-        public long PutPTS(long pts){
+        public long PutPTS(long pts) {
             long temp = 0;
 
-            if (!b_start){
-                if (pts_list.size() == 0){
+            if (!b_start) {
+                if (pts_list.size() == 0) {
                     last_real_pts = pts;
                     last_pts = pts;
                     b_start = true;
                     return pts;
                 }
             }
-            if (pts_list.size() >= max_count){
+            if (pts_list.size() >= max_count) {
                 temp = pts_list.remove(0);
                 pts_d_sum -= temp;
             }
 
-            temp  = pts - last_real_pts;
+            temp = pts - last_real_pts;
             last_real_pts = pts;
 
             pts_list.add(temp);
@@ -1096,14 +1078,13 @@ public class SrsTSMuxer {
 
             temp = pts_d_sum / pts_list.size();
             last_pts += temp;
-            return  last_pts ;
+            return last_pts;
 
         }
     }
 
 
-    private class SrsAVCSpsPps
-    {
+    private class SrsAVCSpsPps {
         public ByteBuffer data = ByteBuffer.allocateDirect(SPSPPS_MAX_LEN);
         public boolean b_changed = true;
     }
@@ -1137,7 +1118,7 @@ public class SrsTSMuxer {
                 if (bb.get(i + 2) == 0x01) {
                     annexb.match = true;
                     annexb.nb_start_code = i + 3 - bb.position();
-                    annexb.nal_unit_type = bb.get(i + 3)  & 0x1f;
+                    annexb.nal_unit_type = bb.get(i + 3) & 0x1f;
                     break;
                 }
             }
@@ -1159,7 +1140,7 @@ public class SrsTSMuxer {
                 }
                 tbb.nal_unit_type = tbbsc.nal_unit_type;
 
-               // find out the frame size.
+                // find out the frame size.
                 tbb.data = bb.slice();
                 int pos = bb.position();
 
@@ -1184,4 +1165,4 @@ public class SrsTSMuxer {
         }
     }
 
- }
+}

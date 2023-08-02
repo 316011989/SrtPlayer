@@ -1,27 +1,21 @@
 package com.sls.liteplayer;
 
-import android.media.AudioRecord;
-import android.media.audiofx.AcousticEchoCanceler;
-import android.media.audiofx.AutomaticGainControl;
 import android.util.Log;
-
-import java.io.File;
-
 
 
 /**
  * Created by Leo Ma on 2016/7/25.
  */
-public class SrsPlayManager{
+public class SrsPlayManager {
 
     private final String TAG = SrsPlayManager.class.getSimpleName();
 
-    private boolean         mExit = false;
-    private SLSTSDemuxer    mTSDemuxer = new SLSTSDemuxer();
-    private SLSSurfaceView  mSurfaceView = null;
-    private SLSMediaCodec   mVideoDecoder = new SLSVideoDecoder();
-    private SLSMediaCodec   mAudioDecoder = new SLSAudioDecoder();
-    private SrsPublisher    mDataReceiver = null;
+    private boolean mExit = false;
+    private SLSTSDemuxer mTSDemuxer = new SLSTSDemuxer();
+    private SLSSurfaceView mSurfaceView = null;
+    private SLSMediaCodec mVideoDecoder = new SLSVideoDecoder();
+    private SLSMediaCodec mAudioDecoder = new SLSAudioDecoder();
+    private SrsPublisher mDataReceiver = null;
 
     private boolean mPlaying = false;
 
@@ -37,6 +31,7 @@ public class SrsPlayManager{
             return mTSDemuxer.getNetDelay();
         return 0;
     }
+
     public String getVideoSize() {
         if (null != mVideoDecoder)
             return mVideoDecoder.getVideoSize();
@@ -61,13 +56,11 @@ public class SrsPlayManager{
 
         if (mSurfaceView == null)
             return false;
-        if (netUrl.substring(0,6).equals("udp://")) {
+        if (netUrl.substring(0, 6).equals("udp://")) {
             mDataReceiver = new SrsMultiCastPublisher();
-        }
-        else if (netUrl.substring(0,6).equals("srt://")){
+        } else if (netUrl.substring(0, 6).equals("srt://")) {
             mDataReceiver = new SrsSRTPublisher();
-        }
-        else {
+        } else {
             Log.i(TAG, String.format("wrong netUrl='%s'", netUrl));
             return false;
         }
@@ -82,7 +75,7 @@ public class SrsPlayManager{
         mDataReceiver.open(netUrl);
         mDataReceiver.startRecv();
 
-       return true;
+        return true;
     }
 
     public boolean stop() {
@@ -91,7 +84,8 @@ public class SrsPlayManager{
         mExit = true;
         mDataReceiver.stop();
         mDataReceiver.close();
-        mTSDemuxer.stop();;
+        mTSDemuxer.stop();
+        ;
         mVideoDecoder.uninit();
         mAudioDecoder.uninit();
         mPlaying = false;
@@ -102,7 +96,8 @@ public class SrsPlayManager{
     public boolean reset() {
         if (!mPlaying)
             return false;
-        mTSDemuxer.stop();;
+        mTSDemuxer.stop();
+        ;
         mVideoDecoder.uninit();
         mAudioDecoder.uninit();
 

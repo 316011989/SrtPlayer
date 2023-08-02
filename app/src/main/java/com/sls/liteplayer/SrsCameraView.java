@@ -42,7 +42,6 @@ public class SrsCameraView extends SurfaceView {
     private SrsEncoder mMedieaEncoder = null;
 
 
-
     public SrsCameraView(Context context) {
 
         this(context, null);
@@ -216,21 +215,21 @@ public class SrsCameraView extends SurfaceView {
         params.setPictureSize(size.width, size.height);
         Log.i(TAG, String.format("set the picture size in %dx%d", size.width, size.height));
 
-        size = null;
-        sizes = params.getSupportedPreviewSizes();
-        for (int i = 0; i < sizes.size(); i++) {
-            Camera.Size s = sizes.get(i);
-            //Log.i(TAG, String.format("camera supported preview size %dx%d", s.width, s.height));
-            if (size == null) {
-                if (s.height == mPreviewHeight) {
-                    size = s;
-                }
-            } else {
-                if (s.width == mPreviewWidth) {
-                    size = s;
-                }
-            }
-        }
+//        size = null;
+//        sizes = params.getSupportedPreviewSizes();
+//        for (int i = 0; i < sizes.size(); i++) {
+//            Camera.Size s = sizes.get(i);
+//            //Log.i(TAG, String.format("camera supported preview size %dx%d", s.width, s.height));
+//            if (size == null) {
+//                if (s.height == mPreviewHeight) {
+//                    size = s;
+//                }
+//            } else {
+//                if (s.width == mPreviewWidth) {
+//                    size = s;
+//                }
+//            }
+//        }
         vsize = size;
         params.setPreviewSize(size.width, size.height);
         Log.i(TAG, String.format("set the preview size in %dx%d", size.width, size.height));

@@ -30,7 +30,6 @@ public class JNISrt {
     }
 
     public int send(byte[] data) {
-        Log.i(TAG, "JNISRT: send datasize=" + data.length);
         if (mSRT <= 0)
             return 0;
         return srtSend(mSRT, data);

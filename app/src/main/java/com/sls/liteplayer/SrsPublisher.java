@@ -26,7 +26,7 @@ import java.net.MulticastSocket;
  */
 public class SrsPublisher {
 
-    private AtomicInteger videoFrameCacheNumber = new AtomicInteger(0);
+    private AtomicInteger videoFrameCacheNumber = new AtomicInteger(10);
 
     //file
     private String mTSFileName = Environment.getExternalStorageDirectory().getPath() + "/test-av.ts";

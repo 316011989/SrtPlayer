@@ -18,9 +18,7 @@ struct srtContext {
 };
 
 extern "C" JNIEXPORT jint JNICALL
-Java_com_sls_liteplayer_JNISrt_srtStartup(
-        JNIEnv *env,
-        jobject /* this */) {
+Java_com_sls_liteplayer_JNISrt_srtStartup(JNIEnv *env,jclass clazz) {
     int status = srt_startup();
     if (status != 0) {
         LOGD("%s(%d):Failed \n", __FUNCTION__, __LINE__);
@@ -30,9 +28,7 @@ Java_com_sls_liteplayer_JNISrt_srtStartup(
 }
 
 extern "C" JNIEXPORT jint JNICALL
-Java_com_sls_liteplayer_JNISrt_srtCleanup(
-        JNIEnv *env,
-        jobject /* this */) {
+Java_com_sls_liteplayer_JNISrt_srtCleanup(JNIEnv *env,jclass clazz) {
     int status = srt_cleanup();
     if (status != 0) {
         LOGD("%s(%d):Failed \n", __FUNCTION__, __LINE__);
@@ -105,7 +101,7 @@ Java_com_sls_liteplayer_JNISrt_srtOpen(
     char server_ip[128] = "192.168.31.56";
     int server_port = 8080;
     char streamid[1024] = "uplive.sls.net/live/1234";
-    int latency = 10;
+    int latency = 500;
 
     char *  url = (char*)env->GetStringUTFChars(str_url,0);
     //parse url
@@ -245,7 +241,7 @@ Java_com_sls_liteplayer_JNISrt_srtSend(
 
     jbyte * olddata = (jbyte*)env->GetByteArrayElements(data, 0);
     jsize  oldsize = env->GetArrayLength(data);
-    status = srt_sendmsg(sc->client_sock, (const char*)olddata, oldsize, -1, 1); // in order must be set to true
+    status = srt_sendmsg(sc->client_sock, (const char*)olddata, oldsize, -1, 0); // in order must be set to true
     if (status == SRT_ERROR) {
         LOGD("%s(%d):Failed \n", __FUNCTION__, __LINE__);
         LOGD("srt_sendmsg: %s\n", srt_getlasterror_str());
@@ -402,3 +398,5 @@ Java_com_sls_liteplayer_JNISrt_yv12RotationAnti(JNIEnv *env, jclass type, jbyteA
     //env->ReleaseByteArrayElements(src_, src, 0);
     //env->ReleaseByteArrayElements(dst_, dst, 0);
 }
+
+
