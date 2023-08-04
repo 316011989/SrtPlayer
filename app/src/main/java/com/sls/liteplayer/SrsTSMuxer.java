@@ -293,20 +293,31 @@ public class SrsTSMuxer {
      * mux audio data
      * */
     public void writeAudioSample(final ByteBuffer bb, MediaCodec.BufferInfo bi) {
-        long base = bi.presentationTimeUs / 1000;
-        long pts = TS_90K_CLOCK * base + TS_PCR_DTS_DELAY;
+        //new
+        long pcr = TS_90K_CLOCK * bi.presentationTimeUs / 1000;// for pcr
+        long pts = pcr + TS_PCR_DTS_DELAY;
+        //FIXME: need to consider dts of B frame
 
-        long d = pts - mAudioMedia.mAudioFrame.real_pts;
         mAudioMedia.mAudioFrame.real_pts = pts;
-
-        //pts = mAudioMedia.mCalcPTS.PutPTS(pts);
         mAudioMedia.mAudioFrame.duration = pts - mAudioMedia.mAudioFrame.pts;
         mAudioMedia.mAudioFrame.pts = pts;
         mAudioMedia.mAudioFrame.dts = pts;
+        mAudioMedia.mAudioFrame.pcr = pcr;
+        //old
+//        long base = bi.presentationTimeUs / 1000;
+//        long pts = TS_90K_CLOCK * base + TS_PCR_DTS_DELAY;
+//
+//        long d = pts - mAudioMedia.mAudioFrame.real_pts;
+//        mAudioMedia.mAudioFrame.real_pts = pts;
+//
+//        //pts = mAudioMedia.mCalcPTS.PutPTS(pts);
+//        mAudioMedia.mAudioFrame.duration = pts - mAudioMedia.mAudioFrame.pts;
+//        mAudioMedia.mAudioFrame.pts = pts;
+//        mAudioMedia.mAudioFrame.dts = pts;
 
-        Log.i(TAG, String.format("audio frame=%d, pts=%d(%d), real_pts=%d, duration=%d, real_duration=%d.",
-                mAudioMedia.mAudioFrame.index, pts, pts/TS_90K_CLOCK, mAudioMedia.mAudioFrame.real_pts,
-                mAudioMedia.mAudioFrame.duration/TS_90K_CLOCK, d/TS_90K_CLOCK));
+//        Log.i(TAG, String.format("audio frame=%d, pts=%d(%d), real_pts=%d, duration=%d, real_duration=%d.",
+//                mAudioMedia.mAudioFrame.index, pts, pts/TS_90K_CLOCK, mAudioMedia.mAudioFrame.real_pts,
+//                mAudioMedia.mAudioFrame.duration/TS_90K_CLOCK, pcr/TS_90K_CLOCK));
 
         byte[] header = new byte[]{(byte) 0xFF, (byte) 0xF1, (byte) 0x50, (byte) 0x80, (byte) 0x2F, (byte) 0x7F, (byte) 0xFC};
         byte tmp = 0;
@@ -436,9 +447,9 @@ public class SrsTSMuxer {
         mVideoMedia.mVideoFrame.dts = pts;
         mVideoMedia.mVideoFrame.pcr = pcr;
 
-        Log.i(TAG, String.format("video frame=%d, pts=%d(%d), real_pts=%d, duration=%d, real_duration=%d.",
-                mVideoMedia.mVideoFrame.index, pts, pts/TS_90K_CLOCK, mVideoMedia.mVideoFrame.real_pts,
-                mVideoMedia.mVideoFrame.duration/TS_90K_CLOCK, pcr/TS_90K_CLOCK));
+//        Log.i(TAG, String.format("video frame=%d, pts=%d(%d), real_pts=%d, duration=%d, real_duration=%d.",
+//                mVideoMedia.mVideoFrame.index, pts, pts/TS_90K_CLOCK, mVideoMedia.mVideoFrame.real_pts,
+//                mVideoMedia.mVideoFrame.duration/TS_90K_CLOCK, pcr/TS_90K_CLOCK));
 
         // send each frame.
         while (bb.position() < bi.size) {
@@ -529,7 +540,7 @@ public class SrsTSMuxer {
     }
 
 
-    private void SrsPESToTS(SrsPESFrame pes_frame) {
+    private synchronized void SrsPESToTS(SrsPESFrame pes_frame) {
         ByteBuffer ts_pack = ByteBuffer.allocateDirect(TS_PACK_LEN);
         ByteBuffer ts_header = ByteBuffer.allocateDirect(4);
         ByteBuffer pes_header = ByteBuffer.allocateDirect(19);//9(header)+5(pts)+5(dts)

@@ -49,7 +49,7 @@ public class SLSAudioDecoder extends SLSMediaCodec {
     public boolean isStop = false;
 
     public SLSAudioDecoder() {
-            prepare();
+        prepare();
 
     }
 
@@ -145,7 +145,8 @@ public class SLSAudioDecoder extends SLSMediaCodec {
                     continue;
                 }
                 DataInfo dataInfo = mFrmList.remove(0);
-                decode(dataInfo.mDataBytes, 0, dataInfo.mDataBytes.length, audioTrack);
+                if (dataInfo != null && dataInfo.mDataBytes != null)
+                    decode(dataInfo.mDataBytes, 0, dataInfo.mDataBytes.length, audioTrack);
             }
         }
     }
@@ -261,7 +262,7 @@ AAC SSR 0x03
         try {
             //返回一个包含有效数据的input buffer的index,-1->不存在
             int inputBufIndex = audioDecoder.dequeueInputBuffer(kTimeOutUs);
-            Log.i("inputBufIndex**", "\n"+inputBufIndex + "\n");
+            Log.i("inputBufIndex**", "\n" + inputBufIndex + "\n");
             if (inputBufIndex >= 0) {
                 //获取当前的ByteBuffer
                 ByteBuffer dstBuf = encodeInputBuffers[inputBufIndex];
@@ -276,7 +277,7 @@ AAC SSR 0x03
             encodeBufferInfo = new MediaCodec.BufferInfo();
             //返回一个output buffer的index，-1->不存在
             int outputBufferIndex = audioDecoder.dequeueOutputBuffer(encodeBufferInfo, kTimeOutUs);
-            Log.i("outputBufferIndex**", "\n"+outputBufferIndex + "\n");
+            Log.i("outputBufferIndex**", "\n" + outputBufferIndex + "\n");
             ByteBuffer outputBuffer;
             while (outputBufferIndex > 0) {
                 //获取解码后的ByteBuffer
@@ -287,7 +288,7 @@ AAC SSR 0x03
                 //清空缓存
                 outputBuffer.clear();
 
-                Log.i("audioTrack--outData**", "\n"+outData.length + "\n");
+                Log.i("audioTrack--outData**", "\n" + outData.length + "\n");
                 //播放解码后的数据
                 audioTrack.write(outData, 0, outData.length);
                 //释放已经解码的buffer

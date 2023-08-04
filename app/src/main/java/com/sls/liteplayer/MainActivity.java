@@ -71,9 +71,9 @@ public class MainActivity extends AppCompatActivity {
                     if (null == mPublishManager) {
                         mPublishManager = new SrsPublishManager();
                     }
-                    mCameraView = (SrsCameraView) findViewById(R.id.camera_preview);
+                    mCameraView = findViewById(R.id.camera_preview);
                     mPublishManager.setCameraView(mCameraView);
-                    TextView localID = (TextView) findViewById(R.id.localID);
+                    TextView localID = findViewById(R.id.localID);
                     mPublishURL = localID.getText().toString();
                     mPublishManager.start(mPublishURL);
                     return true;
@@ -83,9 +83,9 @@ public class MainActivity extends AppCompatActivity {
                         mPlayManager = new SrsPlayManager();
                     }
 
-                    mSurfaceView = (SLSSurfaceView) findViewById(R.id.video_surface);
+                    mSurfaceView = findViewById(R.id.video_surface);
                     mPlayManager.setSurfaceView(mSurfaceView);
-                    TextView peerID = (TextView) findViewById(R.id.peerID);
+                    TextView peerID = findViewById(R.id.peerID);
                     mPlayURL = peerID.getText().toString();
                     mPlayManager.start(mPlayURL);
 
@@ -100,37 +100,20 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    //length用户要求产生字符串的长度
-    public static String getRandomString(int length) {
-        String str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        Random random = new Random();
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < length; i++) {
-            int number = random.nextInt(62);
-            sb.append(str.charAt(number));
-        }
-        return sb.toString();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        int ret = 0;
-        int sock = 0;
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
 
-        //register
-        //registerActivityLifecycleCallbacks(activityLifecycleCallbacks);
-
         // response screen rotation event
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
 
-        mTextMessage = (TextView) findViewById(R.id.message);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        mTextMessage = findViewById(R.id.message);
+        BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         //check camera permission
@@ -162,14 +145,11 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.RECORD_AUDIO}, 1);//1 can be another integer
         }
 
-//        mStreamName = getRandomString(5);
-//        mPlayURL += mStreamName;
-//        mPublishURL += mStreamName;
 
         //init url
-        TextView peerID = (TextView) findViewById(R.id.peerID);
+        TextView peerID = findViewById(R.id.peerID);
         peerID.setText(mPlayURL);
-        TextView localID = (TextView) findViewById(R.id.localID);
+        TextView localID = findViewById(R.id.localID);
         localID.setText(mPublishURL);
 
         //start timer
@@ -190,53 +170,23 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-
-
-        //m_audio = new SLSAudioAec();
-        //m_audio.StartRecorderAndPlayer();
-
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("TAG", "onStart");
         resetMedec();
     }
 
     @Override
     protected void onDestroy() {
-// TODO Auto-generated method stub
         super.onDestroy();
-        Log.d("TAG", "onDestroy");
         if (mPublishManager != null) {
             mPublishManager.stop();
         }
         if (mPlayManager != null) {
             mPlayManager.stop();
         }
-    }
-
-    @Override
-    protected void onPause() {
-// TODO Auto-generated method stub
-        super.onPause();
-        Log.d("TAG", "onPause");
-    }
-
-    @Override
-    protected void onRestart() {
-// TODO Auto-generated method stub
-        super.onRestart();
-        Log.d("TAG", "onRestart");
-    }
-
-    @Override
-    protected void onResume() {
-// TODO Auto-generated method stub
-        super.onResume();
-        Log.d("TAG", "onResume");
     }
 
     void startLogTimer() {
@@ -269,8 +219,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        Log.i(TAG, "onConfigurationChanged: newConfig.orientation=" + newConfig.orientation);
-
         resetMedec();
     }
 

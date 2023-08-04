@@ -1,19 +1,11 @@
 package com.sls.liteplayer;
 
 import android.content.Context;
-import android.media.MediaCodec;
-import android.media.MediaFormat;
-import android.os.Build;
-import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
 
 /**
  * @author zed
@@ -61,15 +53,5 @@ public class SLSSurfaceView extends SurfaceView {
 	public Surface getSurface() {
 		return mSurface;
 	}
-
-
-	public void setOnSupportListener(OnSupportListener listener) {
-		mSupportListener = listener;
-	}
-
-	public void setOnDecodeListener(OnDecodeListener listener){
-		mOnDecodeListener = listener;
-	}
-
 
 }

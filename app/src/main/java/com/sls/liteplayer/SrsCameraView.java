@@ -18,7 +18,7 @@ import java.util.List;
  * Created by Leo Ma on 2016/2/25.
  */
 public class SrsCameraView extends SurfaceView {
-    private final String TAG = MainActivity.class.getSimpleName();
+    private final String TAG = SrsCameraView.class.getSimpleName();
 
     private final int VWIDTH = 640;//1920;
     private final int VHEIGHT = 360;//1080;
@@ -197,8 +197,10 @@ public class SrsCameraView extends SurfaceView {
                 params.setFlashMode(supportedFlashModes.get(0));
             }
         }
-        Camera.Size size = null;
         List<Camera.Size> sizes = params.getSupportedPictureSizes();
+        Camera.Size size = sizes.get(sizes.size() - 1);
+        size.height = 1280;
+        size.width = 720;
         for (int i = 0; i < sizes.size(); i++) {
             Camera.Size s = sizes.get(i);
             //Log.i(TAG, String.format("camera supported picture size %dx%d", s.width, s.height));
