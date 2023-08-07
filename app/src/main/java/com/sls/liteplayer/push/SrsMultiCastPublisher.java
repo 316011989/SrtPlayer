@@ -1,18 +1,9 @@
 
-package com.sls.liteplayer;
+package com.sls.liteplayer.push;
 
-import android.os.Environment;
 import android.util.Log;
 
 import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.FileNotFoundException;
 
 //multicast
 import java.net.DatagramPacket;
@@ -24,7 +15,7 @@ import java.net.MulticastSocket;
  * 
  * @author francois, leoma
  */
-public class SrsMultiCastPublisher  extends SrsPublisher{
+public class SrsMultiCastPublisher   {
 
     //multicast
     private UpdGroupClient mMultiCast = new UpdGroupClient();
@@ -32,9 +23,7 @@ public class SrsMultiCastPublisher  extends SrsPublisher{
     private static final String TAG = "SrsPublisher";
 
 
-    @Override
     public boolean open(String url) {
-        super.open(url);
         return mMultiCast.open(url);
     }
 
@@ -44,9 +33,7 @@ public class SrsMultiCastPublisher  extends SrsPublisher{
     }
 
 
-    @Override
     public void close() {
-        super.close();
 
         if (mMultiCast != null){
             mMultiCast.close();
@@ -55,7 +42,6 @@ public class SrsMultiCastPublisher  extends SrsPublisher{
 
     }
 
-    @Override
     public int send(ByteBuffer data) {
         int ret = -1;
         if (mMultiCast != null){
@@ -63,7 +49,6 @@ public class SrsMultiCastPublisher  extends SrsPublisher{
             mMultiCast.send(data);
             data.flip();
         }
-        super.send(data);
         return ret;
    }
 

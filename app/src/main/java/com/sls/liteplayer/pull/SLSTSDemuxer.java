@@ -1,4 +1,4 @@
-package com.sls.liteplayer;
+package com.sls.liteplayer.pull;
 
 import android.media.MediaCodec;
 import android.media.MediaFormat;
@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.sls.liteplayer.SLSMediaCodec;
 import com.sls.liteplayer.SLSSurfaceView;
 
 /**

@@ -18,7 +18,9 @@ import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import java.util.Random;
+import com.sls.liteplayer.pull.SrsPlayManager;
+import com.sls.liteplayer.push.SrsPublishManager;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -27,10 +29,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView mTextMessage;
 
     private final String TAG = MainActivity.class.getSimpleName();
-
-    private int mVideoWidth = 0;
-    private int mVideoHeight = 0;
-
     private SLSSurfaceView mSurfaceView;
 
     //    private JNISrt mSrt = new JNISrt();

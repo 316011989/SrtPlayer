@@ -1,68 +1,44 @@
 
-package com.sls.liteplayer;
+package com.sls.liteplayer.push;
 
-import android.os.Environment;
-import android.os.SystemClock;
 import android.util.Log;
 
-import com.sls.liteplayer.push.JniPush;
-
 import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-
 import java.util.concurrent.atomic.AtomicInteger;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.FileNotFoundException;
 
 //multicast
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
+
 
 /**
  * Srs implementation of an RTMP publisher
  *
  * @author francois, leoma
  */
-public class SrsSRTPublisher extends SrsPublisher {
+public class SrsSRTPublisher{
 
+    private AtomicInteger videoFrameCacheNumber = new AtomicInteger(10);
     //multicast
-    private JniPush mSrt = new JniPush();
+    private final JniPush mSrt = new JniPush();
     private static final String TAG = "SrsSRTPublisher";
-    private String mNetURL;
-    private boolean mExit = false;
     private boolean mConnected = false;
     private static int mInitCount = -1;
 
-    @Override
     public boolean open(String url) {
-        mNetURL = url;
         init();
-        super.open(url);
-        mExit = false;
         if (!mConnected) {
             mConnected = mSrt.open(url);
         }
         return mConnected;
     }
 
-    @Override
     public void close() {
-        mExit = true;
         if (mSrt != null && mConnected) {
             mSrt.close();
             mConnected = false;
         }
-        super.close();
         uninit();
-        return;
-
     }
 
-    @Override
     public int send(ByteBuffer data) {
         int ret = -1;
         if (mSrt != null) {
@@ -70,12 +46,10 @@ public class SrsSRTPublisher extends SrsPublisher {
             ret = mSrt.send(dst);
             data.flip();
         }
-        super.send(data);
         return ret;
     }
 
 
-    @Override
     public int state() {
         if (mSrt != null) {
             return mSrt.state();
@@ -111,6 +85,26 @@ public class SrsSRTPublisher extends SrsPublisher {
             }
         }
         return mInitCount;
+    }
+
+    public void setVideoResolution(int width, int height) {
+        return;
+    }
+
+    public AtomicInteger getVideoFrameCacheNumber() {
+        return videoFrameCacheNumber;
+    }
+
+    public byte[] byteBuffer2Byte(ByteBuffer byteBuffer){
+        int len = byteBuffer.limit() - byteBuffer.position();
+        byte[] bytes = new byte[len];
+
+        if(byteBuffer.isReadOnly()){
+            return null;
+        }else {
+            byteBuffer.get(bytes);
+        }
+        return bytes;
     }
 
 

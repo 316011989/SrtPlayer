@@ -1,9 +1,11 @@
-package com.sls.liteplayer;
+package com.sls.liteplayer.push;
 
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.SystemClock;
 import android.util.Log;
+
+import com.sls.liteplayer.SrsEncoder;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -21,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SrsTSMuxer {
 
     private volatile boolean connected = false;
-    private SrsPublisher mPublisher = null;
+    private SrsSRTPublisher mPublisher = null;
     //private RtmpHandler mHandler;
 
     private Thread worker;
@@ -159,7 +161,7 @@ public class SrsTSMuxer {
 
     }
 
-    void setPublisher(SrsPublisher publisher) {
+    void setPublisher(SrsSRTPublisher publisher) {
         mPublisher = publisher;
     }
 

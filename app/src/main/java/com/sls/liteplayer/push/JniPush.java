@@ -7,7 +7,6 @@ public class JniPush {
 
     public JniPush() {
         System.loadLibrary("JNISrt");
-        //System.loadLibrary("srt");
     }
 
     private long mSRT = 0;

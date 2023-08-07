@@ -1,13 +1,16 @@
-package com.sls.liteplayer;
+package com.sls.liteplayer.push;
 
 import android.util.Log;
 
+import com.sls.liteplayer.SrsAudioCapture;
+import com.sls.liteplayer.SrsCameraView;
+import com.sls.liteplayer.SrsEncoder;
 
 
 /**
  * Created by Leo Ma on 2016/7/25.
  */
-public class SrsPublishManager{
+public class SrsPublishManager {
 
     private final String TAG = SrsPublishManager.class.getSimpleName();
 
@@ -20,9 +23,9 @@ public class SrsPublishManager{
     protected long lastTimeMillis;
     protected double mSamplingFps;
 
-    protected SrsTSMuxer    mTSMuxer    = null;
-    protected SrsEncoder    mEncoder    = null;
-    protected SrsPublisher  mPublisher  = null;
+    protected SrsTSMuxer mTSMuxer    = null;
+    protected SrsEncoder mEncoder    = null;
+    protected SrsSRTPublisher mPublisher  = null;
 
     private boolean mPublishing = false;
 
@@ -223,18 +226,16 @@ public class SrsPublishManager{
 
 
     public void startPublish(String netUrl) {
-        if (netUrl.substring(0,6).equals("udp://")) {
-            mPublisher = new SrsMultiCastPublisher();
+        if (netUrl.startsWith("udp://")) {
+//            mPublisher = new SrsMultiCastPublisher();
         }
-        else if (netUrl.substring(0,6).equals("srt://")){
+        else if (netUrl.startsWith("srt://")){
             mPublisher = new SrsSRTPublisher();
         }
         else {
             Log.i(TAG, String.format("wrong netUrl='%s'", netUrl));
             return ;
         }
-
-        mPublisher.setSaveFile();
         if (mTSMuxer != null) {
             mTSMuxer.setPublisher(mPublisher);
             mTSMuxer.start(netUrl);

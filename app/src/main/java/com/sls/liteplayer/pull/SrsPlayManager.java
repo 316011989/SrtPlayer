@@ -1,6 +1,11 @@
-package com.sls.liteplayer;
+package com.sls.liteplayer.pull;
 
 import android.util.Log;
+
+import com.sls.liteplayer.SLSAudioDecoder;
+import com.sls.liteplayer.SLSMediaCodec;
+import com.sls.liteplayer.SLSSurfaceView;
+import com.sls.liteplayer.SLSVideoDecoder;
 
 
 /**
@@ -15,7 +20,7 @@ public class SrsPlayManager {
     private SLSSurfaceView mSurfaceView = null;
     private SLSMediaCodec mVideoDecoder = new SLSVideoDecoder();
     private SLSMediaCodec mAudioDecoder = new SLSAudioDecoder();
-    private SrsPublisher mDataReceiver = null;
+    private SrsSRTReceiver mDataReceiver = null;
 
     private boolean mPlaying = false;
 
@@ -56,10 +61,10 @@ public class SrsPlayManager {
 
         if (mSurfaceView == null)
             return false;
-        if (netUrl.substring(0, 6).equals("udp://")) {
-            mDataReceiver = new SrsMultiCastPublisher();
-        } else if (netUrl.substring(0, 6).equals("srt://")) {
-            mDataReceiver = new SrsSRTPublisher();
+        if (netUrl.startsWith("udp://")) {
+//            mDataReceiver = new SrsMultiCastPublisher();
+        } else if (netUrl.startsWith("srt://")) {
+            mDataReceiver = new SrsSRTReceiver();
         } else {
             Log.i(TAG, String.format("wrong netUrl='%s'", netUrl));
             return false;
@@ -85,7 +90,6 @@ public class SrsPlayManager {
         mDataReceiver.stop();
         mDataReceiver.close();
         mTSDemuxer.stop();
-        ;
         mVideoDecoder.uninit();
         mAudioDecoder.uninit();
         mPlaying = false;

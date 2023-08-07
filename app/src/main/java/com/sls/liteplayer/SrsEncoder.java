@@ -7,8 +7,9 @@ import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.media.MediaFormat;
-import android.media.MediaRecorder;
 import android.util.Log;
+
+import com.sls.liteplayer.push.SrsTSMuxer;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
