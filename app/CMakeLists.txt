@@ -11,14 +11,14 @@ add_library(libcrypto STATIC IMPORTED)
 add_library(libsrt STATIC IMPORTED)
 
 set_target_properties(libcrypto
-                      PROPERTIES
-                      IMPORTED_LOCATION
-                      ${CMAKE_SOURCE_DIR}/static/${ANDROID_ABI}/libcrypto.a)
+        PROPERTIES
+        IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/static/${ANDROID_ABI}/libcrypto.a)
 
 set_target_properties(libsrt
-                      PROPERTIES
-                      IMPORTED_LOCATION
-                      ${CMAKE_SOURCE_DIR}/static/${ANDROID_ABI}/libsrt.a)
+        PROPERTIES
+        IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/static/${ANDROID_ABI}/libsrt.a)
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
@@ -27,12 +27,9 @@ set_target_properties(libsrt
 
 include_directories(src/main/jni/include)
 
-add_library( # Sets the name of the library.
-             JNISrt
-             # Sets the library as a shared library.
-             SHARED
-             # Provides a relative path to your source file(s).
-             src/main/jni/JNISrt.cpp )
+add_library(JNISrt SHARED src/main/jni/SrtPush.cpp
+        src/main/jni/SrtPull.cpp)
+
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -41,20 +38,20 @@ add_library( # Sets the name of the library.
 # completing its build.
 
 find_library( # Sets the name of the path variable.
-              log-lib
-              # Specifies the name of the NDK library that
-              # you want CMake to locate.
-              log )
+        log-lib
+        # Specifies the name of the NDK library that
+        # you want CMake to locate.
+        log)
 
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-                       JNISrt
-                       libsrt
-                       libcrypto
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ${log-lib} )
+        JNISrt
+        libsrt
+        libcrypto
+        # Links the target library to the log library
+        # included in the NDK.
+        ${log-lib})
 

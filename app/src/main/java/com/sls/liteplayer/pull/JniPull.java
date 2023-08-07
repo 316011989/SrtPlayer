@@ -1,13 +1,12 @@
-package com.sls.liteplayer;
+package com.sls.liteplayer.pull;
 
 import android.util.Log;
 
-public class JNISrt {
-    private final String TAG = JNISrt.class.getSimpleName();
+public class JniPull {
+    private final String TAG = JniPull.class.getSimpleName();
 
-    JNISrt() {
+    JniPull() {
         System.loadLibrary("JNISrt");
-        //System.loadLibrary("srt");
     }
 
     private long mSRT = 0;
@@ -29,11 +28,6 @@ public class JNISrt {
         return ret == 0;
     }
 
-    public int send(byte[] data) {
-        if (mSRT <= 0)
-            return 0;
-        return srtSend(mSRT, data);
-    }
 
     public byte[] recv() {
         Log.i(TAG, "JNISRT: recv");
@@ -48,16 +42,14 @@ public class JNISrt {
         return srtGetSockState(mSRT);
     }
 
-    public static native int srtStartup();
+    public native int srtStartup();
 
-    public static native int srtCleanup();
+    public native int srtCleanup();
 
 
     public native long srtOpen(String url);
 
     public native int srtClose(long srt);
-
-    public native int srtSend(long srt, byte[] data);
 
     public native byte[] srtRecv(long srt);
 

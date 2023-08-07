@@ -798,7 +798,7 @@ public class SrsTSMuxer {
     /**
      * the aac profile, for ADTS(HLS/TS)
      *
-     * @see https://github.com/simple-rtmp-server/srs/issues/310
+     * @see <a href="https://github.com/simple-rtmp-server/srs/issues/310">...</a>
      */
     private class SrsAacProfile {
         public final static int Reserved = 3;

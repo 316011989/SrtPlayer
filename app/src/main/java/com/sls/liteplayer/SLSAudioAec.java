@@ -153,8 +153,7 @@ public class SLSAudioAec
 		
 		void ReadMic()
 		{
-			if(m_audioRecord == null)
-			{
+			if(m_audioRecord == null){
 				return ;
 			}
 	        m_audioRecord.startRecording();

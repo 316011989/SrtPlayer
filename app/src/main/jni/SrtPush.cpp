@@ -14,11 +14,10 @@
 struct srtContext {
     SRTSOCKET client_sock;
     int client_pollid;
-
 };
 
 extern "C" JNIEXPORT jint JNICALL
-Java_com_sls_liteplayer_JNISrt_srtStartup(JNIEnv *env,jclass clazz) {
+Java_com_sls_liteplayer_push_JniPush_srtStartup(JNIEnv *env,jclass clazz) {
     int status = srt_startup();
     if (status != 0) {
         LOGD("%s(%d):Failed \n", __FUNCTION__, __LINE__);
@@ -28,7 +27,7 @@ Java_com_sls_liteplayer_JNISrt_srtStartup(JNIEnv *env,jclass clazz) {
 }
 
 extern "C" JNIEXPORT jint JNICALL
-Java_com_sls_liteplayer_JNISrt_srtCleanup(JNIEnv *env,jclass clazz) {
+Java_com_sls_liteplayer_push_JniPush_srtCleanup(JNIEnv *env,jclass clazz) {
     int status = srt_cleanup();
     if (status != 0) {
         LOGD("%s(%d):Failed \n", __FUNCTION__, __LINE__);
@@ -44,8 +43,6 @@ bool parse_url(char* url, char * ip, int& port, char * streamid) {
         LOGD( "wrong srt uri format, srt uri must be like vhost/app/stream_name or ip/app/stream_name?vhost=domain.\n");
         return false;
     }
-
-
     char * p = url;
     //protocal
     p = strchr(url, ':');
@@ -92,7 +89,7 @@ bool parse_url(char* url, char * ip, int& port, char * streamid) {
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_com_sls_liteplayer_JNISrt_srtOpen(
+Java_com_sls_liteplayer_push_JniPush_srtOpen(
         JNIEnv *env,
         jobject /* this */, jstring str_url) {
 
@@ -186,7 +183,7 @@ Java_com_sls_liteplayer_JNISrt_srtOpen(
 }
 
 extern "C" JNIEXPORT jint JNICALL
-Java_com_sls_liteplayer_JNISrt_srtClose(
+Java_com_sls_liteplayer_push_JniPush_srtClose(
         JNIEnv *env,
         jobject /* this */, jlong srt) {
 
@@ -205,7 +202,7 @@ Java_com_sls_liteplayer_JNISrt_srtClose(
     return 0;
 }
 extern "C" JNIEXPORT jint JNICALL
-Java_com_sls_liteplayer_JNISrt_srtSend(
+Java_com_sls_liteplayer_push_JniPush_srtSend(
                 JNIEnv *env,
                 jobject /* this */, jlong srt, jbyteArray data) {
 
@@ -251,64 +248,8 @@ Java_com_sls_liteplayer_JNISrt_srtSend(
     return oldsize;
 }
 
-extern "C" JNIEXPORT jbyteArray JNICALL
-Java_com_sls_liteplayer_JNISrt_srtRecv(
-        JNIEnv *env,
-        jobject /* this */, jlong srt) {
-
-    srtContext *sc = (srtContext *)srt;
-    if (!srt)
-        return 0;
-    // Socket readiness for connection is checked by polling on WRITE allowed sockets.
-/*
-    int rlen = 1;
-    SRTSOCKET read[1];
-
-    int wlen = 1;
-    SRTSOCKET write[1];
-
-    int status = srt_epoll_wait(sc->client_pollid, read, &rlen,
-                                write, &wlen,
-                                (int64_t)-1, // -1 is set for debuging purpose.
-            // in case of production we need to set appropriate value
-                                0, 0, 0, 0);
-    if (status == SRT_ERROR) {
-        LOGD("%s(%d):Failed \n", __FUNCTION__, __LINE__);
-        return 0;
-    }
-
-    if (rlen != 0) {
-        LOGD("%s(%d):Failed \n", __FUNCTION__, __LINE__);
-        return 0;
-    }
-
-    if (wlen != 1) {
-        LOGD("%s(%d):Failed \n", __FUNCTION__, __LINE__);
-        return 0;
-    }
-
-    if (read[0] != sc->client_sock) {
-        LOGD("%s(%d):Failed \n", __FUNCTION__, __LINE__);
-        return 0;
-    }
-*/
-    int ts_len = 1316;
-    char recv_data[1316];
-    int status = srt_recvmsg(sc->client_sock, recv_data, ts_len); // in order must be set to true
-    if (status == SRT_ERROR) {
-        LOGD("%s(%d):Failed \n", __FUNCTION__, __LINE__);
-        LOGD("srt_recvmsg: %s\n", srt_getlasterror_str());
-        return 0;
-    }
-   //nOutSize是BYTE数组的长度 BYTE pData[]
-    jbyte *by = (jbyte*)recv_data;
-    jbyteArray jarray = env->NewByteArray(status);
-    env->SetByteArrayRegion(jarray, 0, status, by);
-    return jarray;
-}
-
 extern "C" JNIEXPORT jint JNICALL
-Java_com_sls_liteplayer_JNISrt_srtGetSockState(
+Java_com_sls_liteplayer_push_JniPush_srtGetSockState(
         JNIEnv *env,
         jobject /* this */, jlong srt) {
 
@@ -383,7 +324,7 @@ void yv12RotationAnti90(unsigned char * src, unsigned char * dst, int width, int
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_sls_liteplayer_JNISrt_yv12RotationAnti(JNIEnv *env, jclass type, jbyteArray src_,
+Java_com_sls_liteplayer_push_JniPush_yv12RotationAnti(JNIEnv *env, jclass type, jbyteArray src_,
                                                 jbyteArray dst_, jint w, jint h, jint angle) {
     jbyte *src = env->GetByteArrayElements(src_, NULL);
     jbyte *dst = env->GetByteArrayElements(dst_, NULL);
