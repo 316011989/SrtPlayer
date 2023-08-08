@@ -12,16 +12,16 @@ public class JniPull {
     private long mSRT = 0;
 
     public boolean open(String url) {
-        Log.i(TAG, "JNISRT: open" + url);
+        Log.i(TAG, "JNISRT: open " + url);
         mSRT = srtOpen(url);
-        if (mSRT > 0)
+        if (mSRT != 0 && mSRT != -1)
             return true;
         return false;
     }
 
     public boolean close() {
         Log.i(TAG, "JNISRT: close");
-        if (mSRT <= 0)
+        if (mSRT == 0 || mSRT == -1)
             return false;
         int ret = srtClose(mSRT);
         mSRT = 0;
@@ -31,13 +31,13 @@ public class JniPull {
 
     public byte[] recv() {
         Log.i(TAG, "JNISRT: recv");
-        if (mSRT <= 0)
+        if (mSRT == 0 || mSRT == -1)
             return null;
         return srtRecv(mSRT);
     }
 
     public int state() {
-        if (mSRT <= 0)
+        if (mSRT == 0 || mSRT == -1)
             return -1;
         return srtGetSockState(mSRT);
     }
@@ -54,8 +54,5 @@ public class JniPull {
     public native byte[] srtRecv(long srt);
 
     public native int srtGetSockState(long srt);
-
-    //tools
-    public static native int yv12RotationAnti(byte[] src, byte[] dst, int w, int h, int angle);
 
 }

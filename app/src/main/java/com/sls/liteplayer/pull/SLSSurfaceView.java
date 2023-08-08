@@ -1,4 +1,4 @@
-package com.sls.liteplayer;
+package com.sls.liteplayer.pull;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -16,11 +16,6 @@ import android.view.SurfaceView;
 public class SLSSurfaceView extends SurfaceView {
 
 	private final String TAG = "SLSSurfaceView";
-
-	//解码支持监听器
-	private OnSupportListener mSupportListener;
-	//解码结果监听
-	private OnDecodeListener  mOnDecodeListener;
 	private Surface mSurface;
 
 

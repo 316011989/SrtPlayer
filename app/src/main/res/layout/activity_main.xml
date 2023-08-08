@@ -20,7 +20,7 @@
 
     </android.support.design.widget.BottomNavigationView>
 
-    <com.sls.liteplayer.SLSSurfaceView
+    <com.sls.liteplayer.pull.SLSSurfaceView
         android:id="@+id/video_surface"
         android:layout_width="0dp"
         android:layout_height="400dp"
@@ -32,7 +32,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <com.sls.liteplayer.SrsCameraView
+    <com.sls.liteplayer.push.SrsCameraView
         android:id="@+id/camera_preview"
         android:layout_width="86dp"
         android:layout_height="117dp"

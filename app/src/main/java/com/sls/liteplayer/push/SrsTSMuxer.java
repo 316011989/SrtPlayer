@@ -5,8 +5,6 @@ import android.media.MediaFormat;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.sls.liteplayer.SrsEncoder;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -229,7 +227,7 @@ public class SrsTSMuxer {
         boolean connected = mPublisher.open(netUrl);
 
         worker = new Thread(() -> {
-            while (!Thread.interrupted()) {
+            while (!Thread.interrupted() && connected) {
                 while (!mTSUDPPackList.isEmpty()) {
                     ByteBuffer tsUDPPack = mTSUDPPackList.poll();
                     int ret = sendTSPack(tsUDPPack);
@@ -640,7 +638,7 @@ public class SrsTSMuxer {
                 }
 
                 pes_size = pes_frame.len + header_size + 3;
-                if (pes_size > 0xFFFF || pes_frame.sid == TS_VIDEO_SID|| pes_frame.sid == TS_AUDIO_SID) {
+                if (pes_size > 0xFFFF || pes_frame.sid == TS_VIDEO_SID || pes_frame.sid == TS_AUDIO_SID) {
                     pes_size = 0;
                 }
 

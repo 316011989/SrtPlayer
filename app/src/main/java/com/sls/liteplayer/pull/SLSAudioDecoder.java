@@ -1,6 +1,5 @@
-package com.sls.liteplayer;
+package com.sls.liteplayer.pull;
 
-import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -10,12 +9,8 @@ import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.util.Log;
 
-import com.sls.liteplayer.DataInfo;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 
 
 /**

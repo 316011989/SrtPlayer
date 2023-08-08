@@ -18,7 +18,9 @@ import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.sls.liteplayer.pull.SLSSurfaceView;
 import com.sls.liteplayer.pull.SrsPlayManager;
+import com.sls.liteplayer.push.SrsCameraView;
 import com.sls.liteplayer.push.SrsPublishManager;
 
 import java.util.Timer;
@@ -34,8 +36,11 @@ public class MainActivity extends AppCompatActivity {
     //    private JNISrt mSrt = new JNISrt();
     //private String mPublishURL = "udp://224.5.5.5:5001";
 //    private String mPublishURL = "srt://39.104.103.63:8080?streamid=uplive.sls.com/live/";
-    private String mPublishURL = "srt://192.168.8.15:10080?streamid=#!::h=live/liteplayerz,m=publish";
-    private String mPlayURL = "srt://192.168.8.15:10080?streamid=#!::h=live/liteplayerz,m=request";
+    private String mPublishURL = "srt://192.168.1.111:10080?streamid=#!::h=live/liteplayerz,m=publish";
+    private String mPlayURL = "srt://192.168.1.111:10080?streamid=#!::h=live/liteplayerz,m=request";
+
+//        private String mPublishURL = "srt://192.168.8.15:10080?streamid=#!::h=live/liteplayerz,m=publish";
+//    private String mPlayURL = "srt://192.168.8.15:10080?streamid=#!::h=live/liteplayerz,m=request";
 
     private SrsCameraView mCameraView;
     private SrsPublishManager mPublishManager = null;

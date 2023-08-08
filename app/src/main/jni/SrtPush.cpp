@@ -16,8 +16,11 @@ struct srtContext {
     int client_pollid;
 };
 
+
+
 extern "C" JNIEXPORT jint JNICALL
-Java_com_sls_liteplayer_push_JniPush_srtStartup(JNIEnv *env,jclass clazz) {
+Java_com_sls_liteplayer_push_JniPush_srtStartup(JNIEnv *env, jclass clazz) {
+
     int status = srt_startup();
     if (status != 0) {
         LOGD("%s(%d):Failed \n", __FUNCTION__, __LINE__);
@@ -27,7 +30,7 @@ Java_com_sls_liteplayer_push_JniPush_srtStartup(JNIEnv *env,jclass clazz) {
 }
 
 extern "C" JNIEXPORT jint JNICALL
-Java_com_sls_liteplayer_push_JniPush_srtCleanup(JNIEnv *env,jclass clazz) {
+Java_com_sls_liteplayer_push_JniPush_srtCleanup(JNIEnv *env, jclass clazz) {
     int status = srt_cleanup();
     if (status != 0) {
         LOGD("%s(%d):Failed \n", __FUNCTION__, __LINE__);
@@ -37,13 +40,13 @@ Java_com_sls_liteplayer_push_JniPush_srtCleanup(JNIEnv *env,jclass clazz) {
 }
 
 
-bool parse_url(char* url, char * ip, int& port, char * streamid) {
+bool parse_url(char *url, char *ip, int &port, char *streamid) {
     //srt uri must be like vhost/app/stream_name or ip/app/stream_name?vhost=domain
     if (strlen(url) == 0) {
-        LOGD( "wrong srt uri format, srt uri must be like vhost/app/stream_name or ip/app/stream_name?vhost=domain.\n");
+        LOGD("wrong srt uri format, srt uri must be like vhost/app/stream_name or ip/app/stream_name?vhost=domain.\n");
         return false;
     }
-    char * p = url;
+    char *p = url;
     //protocal
     p = strchr(url, ':');
     if (!p) {
@@ -56,13 +59,12 @@ bool parse_url(char* url, char * ip, int& port, char * streamid) {
     p += 3;//skip 'srt://'
 
     //hostname:port
-    char * p_tmp = strchr(p, ':');
+    char *p_tmp = strchr(p, ':');
     if (p_tmp) {
         p_tmp[0] = 0x00;
         strcpy(ip, p);
         p = p_tmp + 1;
-    }
-    else
+    } else
         return false;
 
     //hostname
@@ -95,15 +97,16 @@ Java_com_sls_liteplayer_push_JniPush_srtOpen(
 
     int yes = 1;
     int no = 0;
-    char server_ip[128] = "192.168.31.56";
-    int server_port = 8080;
-    char streamid[1024] = "uplive.sls.net/live/1234";
+    char server_ip[128];
+    int server_port = 10080;
+    char streamid[1024];
     int latency = 500;
 
-    char *  url = (char*)env->GetStringUTFChars(str_url,0);
+    char *url = (char *) env->GetStringUTFChars(str_url, 0);
     //parse url
-    if (!parse_url(url, server_ip, server_port, streamid)){
-        LOGD("%s(%d): wrong url format, must be 'srt://hostname:port?streamid=live.sls.net/live/1234'. \n", __FUNCTION__, __LINE__);
+    if (!parse_url(url, server_ip, server_port, streamid)) {
+        LOGD("%s(%d): wrong url format, must be 'srt://hostname:port?streamid=live.sls.net/live/1234'. \n",
+             __FUNCTION__, __LINE__);
         return -1;
     }
 
@@ -136,12 +139,14 @@ Java_com_sls_liteplayer_push_JniPush_srtOpen(
     }
 
     if (srt_setsockopt(m_client_sock, 0, SRTO_STREAMID, streamid, strlen(streamid)) < 0) {
-        LOGD("%s(%d):srt_setsockopt SRTO_STREAMID Failed, streamid=%s\n", __FUNCTION__, __LINE__, streamid);
+        LOGD("%s(%d):srt_setsockopt SRTO_STREAMID Failed, streamid=%s\n", __FUNCTION__, __LINE__,
+             streamid);
         return -1;
     }
 
     if (srt_setsockopt(m_client_sock, 0, SRTO_LATENCY, &latency, sizeof latency) < 0) {
-        LOGD("%s(%d):srt_setsockopt SRTO_STREAMID Failed, streamid=%s\n", __FUNCTION__, __LINE__, streamid);
+        LOGD("%s(%d):srt_setsockopt SRTO_STREAMID Failed, streamid=%s\n", __FUNCTION__, __LINE__,
+             streamid);
         return -1;
     }
 
@@ -163,7 +168,6 @@ Java_com_sls_liteplayer_push_JniPush_srtOpen(
 
     struct sockaddr *psa = (struct sockaddr *) &sa;
 
-    LOGD("%s(%d):srt_connect\n", __FUNCTION__, __LINE__);
 
     status = srt_connect(m_client_sock, psa, sizeof sa);
     if (status == SRT_ERROR) {
@@ -173,11 +177,13 @@ Java_com_sls_liteplayer_push_JniPush_srtOpen(
         //srt_cleanup();
         return -1;//env->NewStringUTF(hello.c_str());
     }
+    LOGD("%s(%d):srt_connect status= %d\n", __FUNCTION__, __LINE__, status);
 
     srtContext *sc = new srtContext;
     sc->client_pollid = client_pollid;
     sc->client_sock = m_client_sock;
-    jlong  ret = (jlong)sc;
+    long long ret = (long long) sc;
+    LOGD("%s(%d):srt_connect new srtContext= %d\n", __FUNCTION__, __LINE__, ret);
     return ret;
 
 }
@@ -187,7 +193,7 @@ Java_com_sls_liteplayer_push_JniPush_srtClose(
         JNIEnv *env,
         jobject /* this */, jlong srt) {
 
-    srtContext *sc = (srtContext *)srt;
+    srtContext *sc = (srtContext *) srt;
 
     if (!srt)
         return 0;
@@ -203,10 +209,10 @@ Java_com_sls_liteplayer_push_JniPush_srtClose(
 }
 extern "C" JNIEXPORT jint JNICALL
 Java_com_sls_liteplayer_push_JniPush_srtSend(
-                JNIEnv *env,
-                jobject /* this */, jlong srt, jbyteArray data) {
-
-    srtContext *sc = (srtContext *)srt;
+        JNIEnv *env,
+        jobject /* this */, jlong srt, jbyteArray data) {
+    LOGD("%s(%d):srtSend  srtContext= %d\n", __FUNCTION__, __LINE__, srt);
+    srtContext *sc = (srtContext *) srt;
     if (!srt)
         return 0;
     // Socket readiness for connection is checked by polling on WRITE allowed sockets.
@@ -218,10 +224,10 @@ Java_com_sls_liteplayer_push_JniPush_srtSend(
     SRTSOCKET write[1];
 
     int status = srt_epoll_wait(sc->client_pollid, read, &rlen,
-                                    write, &wlen,
-                                    (int64_t)-1, // -1 is set for debuging purpose.
-                    // in case of production we need to set appropriate value
-                                    0, 0, 0, 0);
+                                write, &wlen,
+                                (int64_t) -1, // -1 is set for debuging purpose.
+            // in case of production we need to set appropriate value
+                                0, 0, 0, 0);
     if (status == SRT_ERROR) {
         LOGD("%s(%d):Failed \n", __FUNCTION__, __LINE__);
         return 0;
@@ -236,9 +242,10 @@ Java_com_sls_liteplayer_push_JniPush_srtSend(
         return 0;
     }
 
-    jbyte * olddata = (jbyte*)env->GetByteArrayElements(data, 0);
-    jsize  oldsize = env->GetArrayLength(data);
-    status = srt_sendmsg(sc->client_sock, (const char*)olddata, oldsize, -1, 0); // in order must be set to true
+    jbyte *olddata = (jbyte *) env->GetByteArrayElements(data, 0);
+    jsize oldsize = env->GetArrayLength(data);
+    status = srt_sendmsg(sc->client_sock, (const char *) olddata, oldsize, -1,
+                         0); // in order must be set to true
     if (status == SRT_ERROR) {
         LOGD("%s(%d):Failed \n", __FUNCTION__, __LINE__);
         LOGD("srt_sendmsg: %s\n", srt_getlasterror_str());
@@ -253,14 +260,14 @@ Java_com_sls_liteplayer_push_JniPush_srtGetSockState(
         JNIEnv *env,
         jobject /* this */, jlong srt) {
 
-    srtContext *sc = (srtContext *)srt;
+    srtContext *sc = (srtContext *) srt;
     if (!srt)
         return -1;
 
     return srt_getsockstate(sc->client_sock);
 }
 
-void yv12RotationAnti270(unsigned char * src, unsigned char * dst, int width, int height) {
+void yv12RotationAnti270(unsigned char *src, unsigned char *dst, int width, int height) {
 
     int dst_pos = 0;
     int src_pos_start = 0;
@@ -291,7 +298,7 @@ void yv12RotationAnti270(unsigned char * src, unsigned char * dst, int width, in
 
 }
 
-void yv12RotationAnti90(unsigned char * src, unsigned char * dst, int width, int height) {
+void yv12RotationAnti90(unsigned char *src, unsigned char *dst, int width, int height) {
 
     int dst_pos = 0;
     int src_pos_start = 0;
@@ -325,15 +332,15 @@ void yv12RotationAnti90(unsigned char * src, unsigned char * dst, int width, int
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_sls_liteplayer_push_JniPush_yv12RotationAnti(JNIEnv *env, jclass type, jbyteArray src_,
-                                                jbyteArray dst_, jint w, jint h, jint angle) {
+                                                      jbyteArray dst_, jint w, jint h, jint angle) {
     jbyte *src = env->GetByteArrayElements(src_, NULL);
     jbyte *dst = env->GetByteArrayElements(dst_, NULL);
 
     // TODO
     if (angle == 270)
-        yv12RotationAnti270((unsigned char*)src, (unsigned char*)dst, w, h);
+        yv12RotationAnti270((unsigned char *) src, (unsigned char *) dst, w, h);
     if (angle == 90)
-        yv12RotationAnti90((unsigned char*)src, (unsigned char*)dst, w, h);
+        yv12RotationAnti90((unsigned char *) src, (unsigned char *) dst, w, h);
     return 0;
 
     //env->ReleaseByteArrayElements(src_, src, 0);

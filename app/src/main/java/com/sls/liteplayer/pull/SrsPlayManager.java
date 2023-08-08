@@ -2,11 +2,6 @@ package com.sls.liteplayer.pull;
 
 import android.util.Log;
 
-import com.sls.liteplayer.SLSAudioDecoder;
-import com.sls.liteplayer.SLSMediaCodec;
-import com.sls.liteplayer.SLSSurfaceView;
-import com.sls.liteplayer.SLSVideoDecoder;
-
 
 /**
  * Created by Leo Ma on 2016/7/25.

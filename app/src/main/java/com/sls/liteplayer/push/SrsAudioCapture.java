@@ -1,4 +1,4 @@
-package com.sls.liteplayer;
+package com.sls.liteplayer.push;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;

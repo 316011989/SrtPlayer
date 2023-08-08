@@ -1,4 +1,4 @@
-package com.sls.liteplayer;
+package com.sls.liteplayer.push;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -8,8 +8,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
-import com.sls.liteplayer.push.JniPush;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -167,8 +165,8 @@ public class SrsCameraView extends SurfaceView {
 
         int VFPS = 24;
         Camera.Parameters params = mCamera.getParameters();
-        params.setPictureSize(mPreviewWidth, mPreviewHeight);
-        params.setPreviewSize(mPreviewWidth, mPreviewHeight);
+//        params.setPictureSize(mPreviewWidth, mPreviewHeight);
+//        params.setPreviewSize(mPreviewWidth, mPreviewHeight);
         int[] range = adaptFpsRange(VFPS, params.getSupportedPreviewFpsRange());
         params.setPreviewFpsRange(range[0], range[1]);
         //params.setPreviewFormat(ImageFormat.NV21);
@@ -199,31 +197,11 @@ public class SrsCameraView extends SurfaceView {
                 params.setFlashMode(supportedFlashModes.get(0));
             }
         }
-        List<Camera.Size> sizes = params.getSupportedPictureSizes();
+        List<Camera.Size> sizes = params.getSupportedPreviewSizes();
         Camera.Size size = sizes.get(sizes.size() - 1);
-        size.height = 1280;
-        size.width = 720;
-        for (int i = 0; i < sizes.size(); i++) {
-            Camera.Size s = sizes.get(i);
-            //Log.i(TAG, String.format("camera supported picture size %dx%d", s.width, s.height));
-            if (size == null) {
-                if (s.height == mPreviewHeight) {
-                    size = s;
-                }
-            } else {
-                if (s.width == mPreviewWidth) {
-                    size = s;
-                }
-            }
-        }
-        params.setPictureSize(size.width, size.height);
-        Log.i(TAG, String.format("set the picture size in %dx%d", size.width, size.height));
-
-//        size = null;
-//        sizes = params.getSupportedPreviewSizes();
 //        for (int i = 0; i < sizes.size(); i++) {
 //            Camera.Size s = sizes.get(i);
-//            //Log.i(TAG, String.format("camera supported preview size %dx%d", s.width, s.height));
+//            //Log.i(TAG, String.format("camera supported picture size %dx%d", s.width, s.height));
 //            if (size == null) {
 //                if (s.height == mPreviewHeight) {
 //                    size = s;
@@ -234,6 +212,26 @@ public class SrsCameraView extends SurfaceView {
 //                }
 //            }
 //        }
+//        params.setPictureSize(size.width, size.height);
+//        Log.i(TAG, String.format("set the picture size in %dx%d", size.width, size.height));
+
+//        size = null;
+//        sizes = params.getSupportedPreviewSizes();
+        for (int i = 0; i < sizes.size(); i++) {
+            Camera.Size s = sizes.get(i);
+            //Log.i(TAG, String.format("camera supported preview size %dx%d", s.width, s.height));
+            if (size == null) {
+                if (s.height == mPreviewHeight) {
+                    size = s;
+                }
+            } else {
+                if (s.width == mPreviewWidth) {
+                    size = s;
+                }
+            }
+        }
+        mPreviewWidth = size.width;
+        mPreviewHeight = size.height;
         vsize = size;
         params.setPreviewSize(size.width, size.height);
         Log.i(TAG, String.format("set the preview size in %dx%d", size.width, size.height));

@@ -1,24 +1,16 @@
 package com.sls.liteplayer.pull;
 
 import android.media.MediaCodec;
-import android.media.MediaFormat;
 import android.util.Log;
 
-import java.io.ByteArrayInputStream;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 //list
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.nio.ByteOrder;
-import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import com.sls.liteplayer.SLSMediaCodec;
-import com.sls.liteplayer.SLSSurfaceView;
 
 /**
  * Created by Edward.Wu on 2019/03/28.

@@ -12,16 +12,17 @@ public class JniPush {
     private long mSRT = 0;
 
     public boolean open(String url) {
-        Log.i(TAG, "JNISRT: open" + url);
+        Log.i(TAG, "JNISRT: open " + url);
         mSRT = srtOpen(url);
-        if (mSRT > 0)
+        Log.i(TAG, "JNISRT: open result " + mSRT);
+        if (mSRT != 0 && mSRT != -1)
             return true;
         return false;
     }
 
     public boolean close() {
         Log.i(TAG, "JNISRT: close");
-        if (mSRT <= 0)
+        if (mSRT == 0 || mSRT == -1)
             return false;
         int ret = srtClose(mSRT);
         mSRT = 0;
@@ -29,13 +30,14 @@ public class JniPush {
     }
 
     public int send(byte[] data) {
-        if (mSRT <= 0)
+        Log.i(TAG, "JNISRT: send");
+        if (mSRT == 0 || mSRT == -1)
             return 0;
         return srtSend(mSRT, data);
     }
 
     public int state() {
-        if (mSRT <= 0)
+        if (mSRT == 0 || mSRT == -1)
             return -1;
         return srtGetSockState(mSRT);
     }
